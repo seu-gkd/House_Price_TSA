@@ -27,8 +27,12 @@ def get_tsa(province, city, region):
         return str(t)
     except:
         sql = "SELECT * from pricehistorynew where province = '{0}' AND city = '{1}' AND citylevel = '{2}'".format(province,city,region)
-        data = pd.read_sql_query(sql.format(region), con=engine, index_col=None, coerce_float=True, params=None,
-                                 parse_dates=None, chunksize=None)
+        try:
+            data = pd.read_sql_query(sql.format(region), con=engine, index_col=None, coerce_float=True, params=None,
+                                    parse_dates=None, chunksize=None)
+        except:
+            msg = Message(1,'error')
+            return json.dumps(msg.__dict__, ensure_ascii=False)
         data['mouth'] = pd.to_datetime(data['mouth'])
         data.columns = ['year', 'ds', 'province', 'city', 'citylevel', 'longitude', 'twist', 'y',
                         'proportion', 'inc', 'inc_2', 'pricehistoryId']
