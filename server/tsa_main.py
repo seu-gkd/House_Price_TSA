@@ -73,8 +73,8 @@ def get_tsa(province, city, region):
                 price_lower = str(round(row['yhat_lower'], 4))
                 price = str(round(row['yhat'], ))
                 msg.add_price(time, price_upper, price_lower, price)
-        with open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'w+', encoding='utf-8') as f:
-            f.write(json.dumps(msg.__dict__, ensure_ascii=False))
+        # with open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'w+', encoding='utf-8') as f:
+        #     f.write(json.dumps(msg.__dict__, ensure_ascii=False))
         return json.dumps(msg.__dict__, ensure_ascii=False)
 
 
