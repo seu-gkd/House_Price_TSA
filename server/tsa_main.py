@@ -36,7 +36,7 @@ def get_tsa(province, city, region):
         except:
             msg = Message(1, 'error')
             return json.dumps(msg.__dict__, ensure_ascii=False)
-    
+
     try:
         f = open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'r', encoding='utf-8')
         t = json.load(f)
@@ -78,8 +78,8 @@ def get_tsa(province, city, region):
 
 if __name__ == '__main__':
     app.config['JSON_AS_ASCII'] = False
-    # app.run(host='0.0.0.0', port=5000, debug=True)
-    app.run()
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    # app.run()
     # get_tsa('朝阳')
 
     # http://10.6.207.179:5000/tsa/<province>&<city>&<region>
