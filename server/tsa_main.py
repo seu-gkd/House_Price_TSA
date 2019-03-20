@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import json
 from msg import Message
+import urllib
 db_info = {'user':'root',
     'password':'gkd123,.',
     'host':'47.101.44.55',
@@ -20,7 +21,14 @@ def hello_world(province, city, region):
 
 @app.route('/tsa/<province>&<city>&<region>')
 def get_tsa(province, city, region):
-    print('province:{0}, city:{1}, region:{2}'.format(province,city,region))
+    try:
+        province = urllib.parse.unquote(province)
+        city = urllib.parse.unquote(city)
+        region = urllib.parse.unquote(region)
+        print('province:{0}, city:{1}, region:{2}'.format(province,city,region))
+    except:
+        msg = Message(1, 'error')
+        return json.dumps(msg.__dict__, ensure_ascii=False)
     try:
         f = open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'r', encoding='utf-8')
         t = json.load(f)
