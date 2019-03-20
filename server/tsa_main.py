@@ -7,6 +7,7 @@ import pandas as pd
 import json
 from msg import Message
 import urllib
+import chardet
 db_info = {'user':'root',
     'password':'gkd123,.',
     'host':'47.101.44.55',
@@ -21,6 +22,13 @@ def hello_world(province, city, region):
 
 @app.route('/tsa/<province>&<city>&<region>')
 def get_tsa(province, city, region):
+    try:
+        province = str(province).decode('string-escape')
+        city = str(city).decode('string-escape')
+        region = str(region).decode('string-escape')
+        print('province:{0}, city:{1}, region:{2}'.format(province, city, region))
+    except:
+        pass
     try:
         province = urllib.parse.unquote(province)
         city = urllib.parse.unquote(city)
