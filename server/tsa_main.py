@@ -1,3 +1,4 @@
+#coding=utf-8
 import os
 from fbprophet import Prophet
 from flask import Flask
@@ -61,8 +62,8 @@ def get_tsa(province, city, region):
 
 if __name__ == '__main__':
     app.config['JSON_AS_ASCII'] = False
-    app.run(host='0.0.0.0', port=5000, debug=True)
-    # app.run()
+    # app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run()
     # get_tsa('朝阳')
 
     # http://10.6.207.179:5000/tsa/<province>&<city>&<region>
