@@ -36,9 +36,10 @@ def get_tsa(province, city, region):
     #     except:
     #         msg = Message(1, 'error')
     #         return json.dumps(msg.__dict__, ensure_ascii=False)
-    province = urllib.parse.unquote(province)
-    city = urllib.parse.unquote(city)
-    region = urllib.parse.unquote(region)
+    province = urllib.parse.unquote(str(province))
+    city = urllib.parse.unquote(str(city))
+    region = urllib.parse.unquote(str(region))
+
     try:
         f = open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'r', encoding='utf-8')
         t = json.load(f)
