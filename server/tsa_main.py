@@ -1,12 +1,13 @@
 #coding=utf-8
 import os
 from fbprophet import Prophet
-from flask import Flask
+from flask import Flask, make_response
 from sqlalchemy import create_engine
 import pandas as pd
 import json
 from msg import Message
 import urllib
+from flask_cors import CORS
 import chardet
 db_info = {'user':'root',
     'password':'gkd123,.',
@@ -15,6 +16,7 @@ db_info = {'user':'root',
 }
 engine = create_engine('mysql+pymysql://%(user)s:%(password)s@%(host)s/%(database)s?charset=utf8' % db_info,encoding='utf-8')
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 @app.route('/hello/<province>&<city>&<region>')
 def hello_world(province, city, region):
     return 'Hello World!' + province + city + region
@@ -76,6 +78,10 @@ def get_tsa(province, city, region):
         # with open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'w+', encoding='utf-8') as f:
         #     f.write(json.dumps(msg.__dict__, ensure_ascii=False))
         res = json.dumps(msg.__dict__, ensure_ascii=False).replace("'",'"')
+        resp = make_response(res)
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers['Access-Control-Allow-Methods'] = 'GET,POST'
+        resp.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
         return res
 
 
