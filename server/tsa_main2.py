@@ -8,7 +8,8 @@ import json
 from msg import Message
 import urllib
 from flask_cors import CORS
-import chardet
+import xgboost as xgb
+
 db_info = {'user':'root',
     'password':'gkd123,.',
     'host':'47.101.44.55',
@@ -17,10 +18,14 @@ db_info = {'user':'root',
 engine = create_engine('mysql+pymysql://%(user)s:%(password)s@%(host)s/%(database)s?charset=utf8' % db_info,encoding='utf-8')
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-@app.route('/hello/<province>&<city>&<region>')
-def hello_world(province, city, region):
-    return 'Hello World!' + province + city + region
 
+@app.route('/loupan/<propertyType>&<landscapingRatio>&<siteArea>&<floorAreaRatio>&<buildingArea>&<yearofpropertyRights>&<parkingRatiopropertycosts>&<hospital>&<metro>&<school>&<mall>&<avgprice>')
+def get_tsa(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice):
+    input = [propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice]
+    tar = xgb.Booster(model_file='xgb.model')
+    x = xgb.DMatrix(input)
+    pre = tar.predict(x)
+    return pre
 
 @app.route('/tsa/<province>&<city>&<region>')
 def get_tsa(province, city, region):
