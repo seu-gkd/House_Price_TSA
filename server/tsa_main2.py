@@ -35,20 +35,24 @@ def get_tsa(province, city, region):
         f.close()
         return str(t)
     except:
-        sql = "SELECT * from pricehistorynew where province = '{0}' AND city = '{1}' AND citylevel = '{2}'".format(province,city,region)
+        sql = "SELECT * from pricehistorynew where province = '{0}' AND city = '{1}' AND citylevel = '{2}'".format(province, city, region)
         try:
             data = pd.read_sql_query(sql.format(region), con=engine, index_col=None, coerce_float=True, params=None,
-                                    parse_dates=None, chunksize=None)
+                                 parse_dates=None, chunksize=None)
         except:
-            msg = Message(1,'error')
-            return json.dumps(msg.__dict__, ensure_ascii=False).replace("'",'"')
+            msg = Message(1, 'error')
+            return json.dumps(msg.__dict__, ensure_ascii=False).replace("'", '"')
+
         data['mouth'] = pd.to_datetime(data['mouth'])
-        data.columns = ['year', 'ds', 'province', 'city', 'citylevel', 'longitude', 'twist', 'y',
-                        'proportion', 'inc', 'inc_2', 'pricehistoryId']
-        m = Prophet()
+        data.columns = ['year', 'ds', 'province', 'city', 'citylevel', 'longitude', 'twist', 'y', 'proportion', 'inc',
+                        'inc_2', 'pricehistoryId']
+        data = data.sort_values(by='ds')
+
+        m = Prophet(yearly_seasonality=4, changepoint_prior_scale=0.09)
         m.fit(data)
-        future = m.make_future_dataframe(periods=3652)
+        future = m.make_future_dataframe(periods=1470)
         fcst = m.predict(future)
+
         province = str(data[2:3]['province'].values).split("'")[1]
         city = str(data[2:3]['city'].values).split("'")[1]
         citylevel = str(data[2:3]['citylevel'].values).split("'")[1]
@@ -62,8 +66,11 @@ def get_tsa(province, city, region):
                 price_lower = str(round(row['yhat_lower'], 4))
                 price = str(round(row['yhat'] + round(row['yhat_upper'] + row['yhat_lower'])/3, ))
                 msg.add_price(time, price_upper, price_lower, price)
-        # with open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'w+', encoding='utf-8') as f:
-        #     f.write(json.dumps(msg.__dict__, ensure_ascii=False))
+        try:
+            with open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'w+', encoding='utf-8') as f:
+                f.write(json.dumps(msg.__dict__, ensure_ascii=False))
+        except:
+            pass
         res = json.dumps(msg.__dict__, ensure_ascii=False).replace("'",'"')
         resp = make_response(res)
         resp.headers['Access-Control-Allow-Origin'] = '*'

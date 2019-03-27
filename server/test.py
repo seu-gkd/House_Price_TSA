@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import json
 from msg import Message
+import os
 db_info = {'user':'root',
     'password':'gkd123,.',
     'host':'47.101.44.55',
@@ -42,5 +43,30 @@ def get_tsa(region):
         f.write(json.dumps(msg.__dict__))
     return json.dumps(msg.__dict__)
 
+def test():
+    province = '江苏'
+    city = '南京'
+    region = '江宁'
+
+    sql = "SELECT * from pricehistorynew where province = '{0}' AND city = '{1}' AND citylevel = '{2}'".format(
+        province, city, region)
+    try:
+        data = pd.read_sql_query(sql.format(region), con=engine, index_col=None, coerce_float=True, params=None,
+                                 parse_dates=None, chunksize=None)
+    except:
+        msg = Message(1, 'error')
+        return json.dumps(msg.__dict__, ensure_ascii=False).replace("'", '"')
+    data['mouth'] = pd.to_datetime(data['mouth'])
+    data.columns = ['year', 'ds', 'province', 'city', 'citylevel', 'longitude', 'twist', 'y',
+                    'proportion', 'inc', 'inc_2', 'pricehistoryId']
+    m = Prophet()
+    m.fit(data)
+    future = m.make_future_dataframe(periods=3652)
+    fcst = m.predict(future)
+    pic = m.plot(fcst)
+    pic.savefig('tt.png')
+
+
 if __name__ == '__main__':
-    get_tsa('朝阳')
+    # get_tsa('朝阳')
+    test()
