@@ -20,7 +20,7 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
 @app.route('/loupan/<propertyType>&<landscapingRatio>&<siteArea>&<floorAreaRatio>&<buildingArea>&<yearofpropertyRights>&<parkingRatiopropertycosts>&<hospital>&<metro>&<school>&<mall>&<avgprice>')
-def get_tsa(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice):
+def get_loupan(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice):
     input = [propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice]
     tar = xgb.Booster(model_file='xgb.model')
     x = xgb.DMatrix(input)
