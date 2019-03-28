@@ -21,11 +21,11 @@ CORS(app, supports_credentials=True)
 
 @app.route('/loupan/<propertyType>&<landscapingRatio>&<siteArea>&<floorAreaRatio>&<buildingArea>&<yearofpropertyRights>&<parkingRatio>&<propertycosts>&<hospital>&<metro>&<school>&<mall>&<avgprice>')
 def get_loupan(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice):
-    input = [propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice]
-    tar = xgb.Booster(model_file='xgb.model')
+    input = [int(propertyType), float(landscapingRatio), float(siteArea), float(floorAreaRatio), float(buildingArea), float(yearofpropertyRights), float(parkingRatio), float(propertycosts), float(hospital), float(metro), float(school), float(mall), float(avgprice)]
     x = xgb.DMatrix(input)
+    tar = xgb.Booster(model_file='xgb.model')
     pre = tar.predict(x)
-    return pre
+    return str(pre[0])
 
 @app.route('/tsa/<province>&<city>&<region>')
 def get_tsa(province, city, region):
