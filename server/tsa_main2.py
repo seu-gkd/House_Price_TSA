@@ -69,7 +69,11 @@ def get_tsa(province, city, region):
                 time = t[0] + '-' + t[1]
                 price_upper = str(round(row['yhat_upper'], 4))
                 price_lower = str(round(row['yhat_lower'], 4))
-                price = str(round(row['yhat'] + round(row['yhat_upper'] + row['yhat_lower'])/3, ))
+                try:
+                    price = str(data[data['ds'] == row['ds']]['y'].values[0])
+                except:
+                    # price = str(round(row['yhat'] + round(row['yhat_upper'] + row['yhat_lower'])/3, ))
+                    price = str(round(row['yhat'],2))
                 msg.add_price(time, price_upper, price_lower, price)
         try:
             with open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'w+', encoding='utf-8') as f:
