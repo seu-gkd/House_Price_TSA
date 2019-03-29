@@ -8,8 +8,9 @@ import json
 from msg import Message
 import urllib
 from flask_cors import CORS
+import requests
 import xgboost as xgb
-
+from data import *
 db_info = {'user':'root',
     'password':'gkd123,.',
     'host':'47.101.44.55',
@@ -19,13 +20,51 @@ engine = create_engine('mysql+pymysql://%(user)s:%(password)s@%(host)s/%(databas
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
-@app.route('/loupan/<propertyType>&<landscapingRatio>&<siteArea>&<floorAreaRatio>&<buildingArea>&<yearofpropertyRights>&<parkingRatio>&<propertycosts>&<hospital>&<metro>&<school>&<mall>&<avgprice>')
-def get_loupan(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice):
-    input = [int(propertyType), float(landscapingRatio), float(siteArea), float(floorAreaRatio), float(buildingArea), float(yearofpropertyRights), float(parkingRatio), float(propertycosts), float(hospital), float(metro), float(school), float(mall), float(avgprice)]
+# @app.route('/loupan/<propertyType>&<landscapingRatio>&<siteArea>&<floorAreaRatio>&<buildingArea>&<yearofpropertyRights>&<parkingRatio>&<propertycosts>&<hospital>&<metro>&<school>&<mall>&<avgprice>')
+# def get_loupan(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, hospital, metro, school, mall, avgprice):
+#     input = [int(propertyType), float(landscapingRatio), float(siteArea), float(floorAreaRatio), float(buildingArea), float(yearofpropertyRights), float(parkingRatio), float(propertycosts), float(hospital), float(metro), float(school), float(mall), float(avgprice)]
+#     x = xgb.DMatrix(input)
+#     tar = xgb.Booster(model_file='xgb.model')
+#     pre = tar.predict(x)
+#     return str(pre[0])
+
+@app.route('/loupan/<propertyType>&<landscapingRatio>&<siteArea>&<floorAreaRatio>&<buildingArea>&<yearofpropertyRights>&<parkingRatio>&<propertycosts>&<lat>&<lng>')
+def get_loupan(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildingArea, yearofpropertyRights, parkingRatio, propertycosts, lat, lng):
+    ak = 'nVPoiLMEoGMsNp5zsewOhVEfXRydOnyg'
+    price_sql = "select regionname,avgprice from regioninfo where cityname='{0}'"
+    location = str(lat) + ',' + str(lng)
+    nearby_api = 'http://api.map.baidu.com/place/v2/search?query={0}&location={1}&radius=2000&output=json&ak={2}'
+    address_api = 'http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location={0}&output=json&pois=1&latest_admin=1&ak={1}'
+    # hospital, metro, school, mall
+    params = [0,0,0,0]
+    targets = ['医院','地铁站','学校','商场']
+    for i in range(len(targets)):
+        json_text = requests.get(nearby_api.format(targets[i], location, ak)).text.replace(' ', '').replace('\n', '')
+        js = json.loads(json_text)
+        params[i] = len(js['results'])
+    # avg(price)
+    json_text = requests.get(address_api.format(location, ak)).text.split('enderReverse&&renderReverse(')[1][:-1].replace(' ', '').replace('\n', '')
+    js = json.loads(json_text)
+    address = js['result']['formatted_address']
+    price = -1
+    for i in cities:
+        if i in address:
+            data = pd.read_sql_query(price_sql.format(i), con=engine, index_col=None, coerce_float=True, params=None, parse_dates=None, chunksize=None)
+            for index, row in data.iterrows():
+                if row['regionname'] in address:
+                    price = row['avgprice']
+    if price == -1:
+        msg = Message(1, '没有相应地区的价格信息')
+        return json.dumps(msg.__dict__, ensure_ascii=False).replace("'", '"')
+
+
+    input = [int(propertyType), float(landscapingRatio), float(siteArea), float(floorAreaRatio), float(buildingArea), float(yearofpropertyRights), float(parkingRatio), float(propertycosts), float(params[0]), float(params[1]), float(params[2]), float(params[3]), float(price)]
     x = xgb.DMatrix(input)
     tar = xgb.Booster(model_file='xgb.model')
     pre = tar.predict(x)
-    return str(pre[0])
+    msg = Message(0, 'success')
+    msg.add_price('0','0','0',str(pre[0]))
+    return json.dumps(msg.__dict__, ensure_ascii=False).replace("'", '"')
 
 @app.route('/tsa/<province>&<city>&<region>')
 def get_tsa(province, city, region):
