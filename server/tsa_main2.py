@@ -53,7 +53,7 @@ def get_tsa(province, city, region):
                         'inc_2', 'pricehistoryId']
         data = data.sort_values(by='ds')
 
-        m = Prophet(yearly_seasonality=4, changepoint_prior_scale=0.09)
+        m = Prophet(yearly_seasonality=4, changepoint_prior_scale=0.09, weekly_seasonality=False, daily_seasonality=False)
         m.fit(data)
         future = m.make_future_dataframe(periods=1470)
         fcst = m.predict(future)
@@ -81,7 +81,7 @@ def get_tsa(province, city, region):
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Access-Control-Allow-Methods'] = 'GET,POST'
         resp.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
-        return res
+        return res.replace("'", '"')
 
 
 
