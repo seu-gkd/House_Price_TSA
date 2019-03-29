@@ -38,7 +38,7 @@ def get_tsa(province, city, region):
         f = open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'r', encoding='utf-8')
         t = json.load(f)
         f.close()
-        return str(t)
+        return str(t).replace("'",'"')
     except:
         sql = "SELECT * from pricehistorynew where province = '{0}' AND city = '{1}' AND citylevel = '{2}'".format(province, city, region)
         try:
