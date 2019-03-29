@@ -53,17 +53,20 @@ def get_loupan(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildin
             for index, row in data.iterrows():
                 if row['regionname'] in address:
                     price = row['avgprice']
+                    print('{0}:{1}'.format(address, price))
+                    coefficient = (1 if price < 4000 else price / 31000)
     if price == -1:
         msg = Message(1, '没有相应地区的价格信息')
         return json.dumps(msg.__dict__, ensure_ascii=False).replace("'", '"')
 
 
     input = [int(propertyType), float(landscapingRatio), float(siteArea), float(floorAreaRatio), float(buildingArea), float(yearofpropertyRights), float(parkingRatio), float(propertycosts), float(params[0]), float(params[1]), float(params[2]), float(params[3]), float(price)]
+
     x = xgb.DMatrix(input)
     tar = xgb.Booster(model_file='xgb.model')
     pre = tar.predict(x)
     msg = Message(0, 'success')
-    msg.data = str(pre[0])
+    msg.data = str(pre[0] * coefficient)
     return json.dumps(msg.__dict__, ensure_ascii=False).replace("'", '"')
 
 @app.route('/tsa/<province>&<city>&<region>')
