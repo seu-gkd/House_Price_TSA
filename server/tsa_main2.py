@@ -33,7 +33,7 @@ def get_loupan(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildin
     ak = 'nVPoiLMEoGMsNp5zsewOhVEfXRydOnyg'
     price_sql = "select regionname,avgprice from regioninfo where cityname='{0}'"
     location = str(lat) + ',' + str(lng)
-    nearby_api = 'http://api.map.baidu.com/place/v2/search?query={0}&location={1}&radius=2000&output=json&ak={2}'
+    nearby_api = 'http://api.map.baidu.com/place/v2/search?query={0}&location={1}&radius=20000&output=json&ak={2}'
     address_api = 'http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location={0}&output=json&pois=1&latest_admin=1&ak={1}'
     # hospital, metro, school, mall
     params = [0,0,0,0]
