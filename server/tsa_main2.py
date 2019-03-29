@@ -81,7 +81,7 @@ def get_tsa(province, city, region):
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Access-Control-Allow-Methods'] = 'GET,POST'
         resp.headers['Access-Control-Allow-Headers'] = 'x-requested-with,content-type'
-        return res.replace("'", '"')
+        return res.replace("\'", '\"')
 
 
 
