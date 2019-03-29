@@ -77,7 +77,7 @@ def get_tsa(province, city, region):
                 msg.add_price(time, price_upper, price_lower, price)
         try:
             with open(os.getcwd() + '/data/{0}{1}{2}.json'.format(province,city,region), 'w+', encoding='utf-8') as f:
-                f.write(json.dumps(msg.__dict__, ensure_ascii=False))
+                f.write(json.dumps(msg.__dict__, ensure_ascii=False).replace("\'", '\"'))
         except:
             print('write error')
         res = json.dumps(msg.__dict__, ensure_ascii=False).replace("'",'"')
