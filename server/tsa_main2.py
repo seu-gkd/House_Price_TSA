@@ -55,7 +55,7 @@ def get_tsa(province, city, region):
 
         m = Prophet(yearly_seasonality=4, changepoint_prior_scale=0.09, weekly_seasonality=False, daily_seasonality=False)
         m.fit(data)
-        future = m.make_future_dataframe(periods=1470)
+        future = m.make_future_dataframe(periods=365)
         fcst = m.predict(future)
 
         province = str(data[2:3]['province'].values).split("'")[1]
