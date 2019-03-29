@@ -61,7 +61,7 @@ def get_tsa(province, city, region):
         province = str(data[2:3]['province'].values).split("'")[1]
         city = str(data[2:3]['city'].values).split("'")[1]
         citylevel = str(data[2:3]['citylevel'].values).split("'")[1]
-        msg = Message()
+        msg = Message(0,"success","success")
         msg.set_location(province, city, citylevel)
         for index, row in fcst.iterrows():
             t = str(row['ds']).split(' ')[0].split('-')
