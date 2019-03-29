@@ -63,7 +63,7 @@ def get_loupan(propertyType, landscapingRatio, siteArea, floorAreaRatio, buildin
     tar = xgb.Booster(model_file='xgb.model')
     pre = tar.predict(x)
     msg = Message(0, 'success')
-    msg.add_price('0','0','0',str(pre[0]))
+    msg.data = str(pre[0])
     return json.dumps(msg.__dict__, ensure_ascii=False).replace("'", '"')
 
 @app.route('/tsa/<province>&<city>&<region>')
